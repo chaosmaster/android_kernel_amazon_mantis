@@ -1,0 +1,8 @@
+config ROGUE_GE8300
+	tristate "Imagination GPU GE8300"
+	depends on ARM || ARM64
+	select DMA_SHARED_BUFFER
+	select PM_DEVFREQ
+	select PM_OPP
+
+

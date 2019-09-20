@@ -1,0 +1,35 @@
+menu "Amazon"
+
+config AMAZON
+	bool "Amazon Drivers"
+	default n
+	---help---
+		Enable support for various drivers needed on the Amazon Fire OS
+		platform
+
+if AMAZON
+
+config AMAZON_METRICS_LOG
+	bool "Amazon Metrics logger driver"
+	select RING_BUFFER
+	default n
+	---help---
+		Enable Amazon Metrics/Vitals logger driver
+
+config AMAZON_METRICS_LOG_TEST
+	tristate "Amazon Metrics logger driver test module"
+	depends on AMAZON_METRICS_LOG
+	default n
+	---help---
+		Enable Amazon Metrics/Vitals logger test module
+
+config AMAZON_SIGN_OF_LIFE
+	bool "Amazon Sign of Life"
+	default n
+	help
+		Enable the life cycle metrics to log device boot and
+		shutdown information
+
+endif # if AMAZON
+
+endmenu

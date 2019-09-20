@@ -1,0 +1,239 @@
+/*
+ * Copyright (c) 2017 MediaTek Inc.
+ * Author: Joe Yang <joe.yang@mediatek.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include "mt8695fpga.dtsi"
+
+/ {
+	model = "MediaTek mt8695 fpga board";
+	compatible = "mediatek,mt8695fpga", "mediatek,mt8695";
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0 0x40000000 0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=tty0 console=ttyS1,921600n1 \
+earlycon=uart8250,mmio32,0x11003000 root=/dev/ram initrd=0x44000000,0x600000 \
+loglevel=8 initcall_debug=1 androidboot.selinux=permissive \
+androidboot.hardware=mt8695 androidboot.serialno=0123456789ABCDEF";
+	};
+
+	mmc_fixed_3v3: fixedregulator@0 {
+		compatible = "regulator-fixed";
+		regulator-name = "mmc_power";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	mmc_fixed_1v8_io: fixedregulator@1 {
+		compatible = "regulator-fixed";
+		regulator-name = "mmc_io";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	mmc1_vmc: gpio-regulator@0 {
+		compatible = "regulator-gpio";
+		regulator-name = "mmc1_vmc";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpios = <&pio 79 GPIO_ACTIVE_LOW>;
+	};
+
+	mmc1_vqmmc: gpio-regulator@1 {
+		compatible = "regulator-gpio";
+		regulator-name = "mmc1_vqmmc";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		enable-gpio = <&pio 78 GPIO_ACTIVE_HIGH>;
+		gpios = <&pio 81 GPIO_ACTIVE_HIGH>;
+		states = <1800000 0x0
+			  3300000 0x1>;
+		startup-delay-us = <5000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	sound: sound {
+		compatible = "mediatek,mt8695-audio-card";
+		mediatek,platform = <&afe>;
+		status = "okay";
+	};
+};
+
+&i2c2 {
+	clock-frequency = <400000>;
+	status = "disabled";
+	md1122-phy@60 {
+		compatible = "mediatek,md1122";
+		reg = <0x60>;
+	};
+};
+
+&mmc0 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc0_pins_default>;
+	pinctrl-1 = <&mmc0_pins_uhs>;
+	status = "okay";
+	bus-width = <8>;
+	max-frequency = <6000000>;
+	cap-mmc-highspeed;
+	mmc-hs200-1_8v;
+	cap-mmc-hw-reset;
+	r_smpl = <0>;
+	vmmc-supply = <&mmc_fixed_3v3>;
+	vqmmc-supply = <&mmc_fixed_1v8_io>;
+	non-removable;
+};
+
+&mmc1 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc1_pins_default>;
+	pinctrl-1 = <&mmc1_pins_uhs>;
+	status = "disabled";
+	bus-width = <4>;
+	max-frequency = <6000000>;
+	cap-sd-highspeed;
+	vmmc-supply = <&mmc_fixed_3v3>;
+	vqmmc-supply = <&mmc_fixed_3v3>;
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&pio {
+	mmc0_pins_default: mmc0default {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_44_EMMC_DAT0__FUNC_MSDC0_DAT0>,
+				 <MT8695_PIN_43_EMMC_DAT1__FUNC_MSDC0_DAT1>,
+				 <MT8695_PIN_42_EMMC_DAT2__FUNC_MSDC0_DAT2>,
+				 <MT8695_PIN_41_EMMC_DAT3__FUNC_MSDC0_DAT3>,
+				 <MT8695_PIN_40_EMMC_DAT4__FUNC_MSDC0_DAT4>,
+				 <MT8695_PIN_39_EMMC_DAT5__FUNC_MSDC0_DAT5>,
+				 <MT8695_PIN_38_EMMC_DAT6__FUNC_MSDC0_DAT6>,
+				 <MT8695_PIN_37_EMMC_DAT7__FUNC_MSDC0_DAT7>,
+				 <MT8695_PIN_45_EMMC_CMD__FUNC_MSDC0_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_36_EMMC_CLK__FUNC_MSDC0_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_rst {
+			pinmux = <MT8695_PIN_46_EMMC_RSTB__FUNC_MSDC0_RSTB>;
+			bias-pull-up;
+		};
+	};
+
+	mmc0_pins_uhs: mmc0@0{
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_44_EMMC_DAT0__FUNC_MSDC0_DAT0>,
+				 <MT8695_PIN_43_EMMC_DAT1__FUNC_MSDC0_DAT1>,
+				 <MT8695_PIN_42_EMMC_DAT2__FUNC_MSDC0_DAT2>,
+				 <MT8695_PIN_41_EMMC_DAT3__FUNC_MSDC0_DAT3>,
+				 <MT8695_PIN_40_EMMC_DAT4__FUNC_MSDC0_DAT4>,
+				 <MT8695_PIN_39_EMMC_DAT5__FUNC_MSDC0_DAT5>,
+				 <MT8695_PIN_38_EMMC_DAT6__FUNC_MSDC0_DAT6>,
+				 <MT8695_PIN_37_EMMC_DAT7__FUNC_MSDC0_DAT7>,
+				 <MT8695_PIN_45_EMMC_CMD__FUNC_MSDC0_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_36_EMMC_CLK__FUNC_MSDC0_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_ds {
+			pinmux = <MT8695_PIN_35_EMMC_DSL__FUNC_MSDC0_DSL>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_rst {
+			pinmux = <MT8695_PIN_46_EMMC_RSTB__FUNC_MSDC0_RSTB>;
+			bias-pull-up;
+		};
+
+	};
+
+	mmc1_pins_default: mmc1default {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_70_MSDC1_DATA0__FUNC_MSDC1_DAT0>,
+				 <MT8695_PIN_68_MSDC1_DATA1__FUNC_MSDC1_DAT1>,
+				 <MT8695_PIN_69_MSDC1_DATA2__FUNC_MSDC1_DAT2>,
+				 <MT8695_PIN_67_MSDC1_DATA3__FUNC_MSDC1_DAT3>,
+				 <MT8695_PIN_71_MSDC1_CMD__FUNC_MSDC1_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_66_MSDC1_CLK__FUNC_MSDC1_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_insert {
+			pinmux = <MT8695_PIN_80_GPIO80__FUNC_GPIO80>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+	mmc1_pins_uhs: mmc1@0{
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_70_MSDC1_DATA0__FUNC_MSDC1_DAT0>,
+				 <MT8695_PIN_68_MSDC1_DATA1__FUNC_MSDC1_DAT1>,
+				 <MT8695_PIN_69_MSDC1_DATA2__FUNC_MSDC1_DAT2>,
+				 <MT8695_PIN_67_MSDC1_DATA3__FUNC_MSDC1_DAT3>,
+				 <MT8695_PIN_71_MSDC1_CMD__FUNC_MSDC1_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_66_MSDC1_CLK__FUNC_MSDC1_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+	};
+};
+
+&ssusb {
+	dr_mode = "peripheral"; /* 1: host, 2: peripheral, 3: otg (dual-mode) */
+	status = "okay";
+};

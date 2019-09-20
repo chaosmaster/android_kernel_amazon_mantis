@@ -1,0 +1,263 @@
+/*
+ * arch/arm/boot/dts/mantis_thermal_zones.dtsi
+ *
+ * Copyright (C) 2018 Amazon, Inc. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+*/
+
+/ {
+	thermal-zones {
+		board_thermal {
+			polling-delay = <1000>;
+			polling-delay-passive = <100>;
+			sustainable-power = <2150>;
+			policy = "trip_step_wise";
+
+			thermal-sensors = <&virtual_sensor>;
+
+			trips {
+				board_trip10: trip-point@0 {
+					temperature = <57000>;
+					hysteresis = <500>;
+					type = "passive";
+				};
+				board_trip11: trip-point@1 {
+					temperature = <58000>;
+					hysteresis = <500>;
+					type = "passive";
+				};
+				board_trip12: trip-point@2 {
+					temperature = <59000>;
+					hysteresis = <500>;
+					type = "passive";
+				};
+				board_trip13: trip-point@3 {
+					temperature = <60000>;
+					hysteresis = <500>;
+					type = "passive";
+				};
+				board_trip_critical1: trip-point@4 {
+					temperature = <63000>;
+					hysteresis = <500>;
+					type = "critical";
+				};
+			};
+
+			cooling-maps {
+				cpufreq_cooling_map0 {
+					trip = <&board_trip10>;
+					cooling-device = <&cpus 0 2>; /* min cooling state, max cooling state in this map */
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map1 {
+					trip = <&board_trip11>;
+					cooling-device = <&cpus 2 4>;
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map2 {
+					trip = <&board_trip12>;
+					cooling-device = <&cpus 4 5>;
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map3 {
+					trip = <&board_trip13>;
+					cooling-device = <&cpus 5 6>;
+					contribution = <1024>;
+				};
+
+				cpucore_cooling_map0 {
+					trip = <&board_trip10>;
+					cooling-device = <&cpu_cluster0 0 0>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map1 {
+					trip = <&board_trip11>;
+					cooling-device = <&cpu_cluster0 0 0>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map2 {
+					trip = <&board_trip12>;
+					cooling-device = <&cpu_cluster0 0 1>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map3 {
+					trip = <&board_trip13>;
+					cooling-device = <&cpu_cluster0 1 2>;
+					contribution = <1024>;
+				};
+
+				gpufreq_cooling_map0 {
+					trip = <&board_trip10>;
+					cooling-device = <&clark 0 0>; /* min cooling state, max cooling state in this map */
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map1 {
+					trip = <&board_trip11>;
+					cooling-device = <&clark 0 0>;
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map2 {
+					trip = <&board_trip12>;
+					cooling-device = <&clark 0 1>;
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map3 {
+					trip = <&board_trip13>;
+					cooling-device = <&clark 1 1>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map0 {
+					trip = <&board_trip10>;
+					cooling-device = <&wifi_cool 0 0>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map1 {
+					trip = <&board_trip11>;
+					cooling-device = <&wifi_cool 0 1>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map2 {
+					trip = <&board_trip12>;
+					cooling-device = <&wifi_cool 1 2>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map3 {
+					trip = <&board_trip13>;
+					cooling-device = <&wifi_cool 2 2>;
+					contribution = <1024>;
+				};
+			};	/* cooling maps */
+		}; /* board thermal */
+		soc_thermal {
+			polling-delay = <1000>;
+			polling-delay-passive = <100>;
+			sustainable-power = <2150>;
+			policy = "trip_step_wise";
+
+			thermal-sensors = <&thermal>;
+
+			trips {
+				soc_trip10: trip-point@0 {
+					temperature = <90000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_trip11: trip-point@1 {
+					temperature = <94000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_trip12: trip-point@2 {
+					temperature = <98000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_trip13: trip-point@3 {
+					temperature = <102000>;
+					hysteresis = <1000>;
+					type = "passive";
+				};
+				soc_trip_critical1: trip-point@4 {
+					temperature = <110000>;
+					hysteresis = <1000>;
+					type = "critical";
+				};
+			};
+
+			cooling-maps {
+				cpufreq_cooling_map0 {
+					trip = <&soc_trip10>;
+					cooling-device = <&cpus 0 2>; /* min cooling state, max cooling state in this map */
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map1 {
+					trip = <&soc_trip11>;
+					cooling-device = <&cpus 2 4>;
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map2 {
+					trip = <&soc_trip12>;
+					cooling-device = <&cpus 4 5>;
+					contribution = <1024>;
+				};
+				cpufreq_cooling_map3 {
+					trip = <&soc_trip13>;
+					cooling-device = <&cpus 5 6>;
+					contribution = <1024>;
+				};
+
+				cpucore_cooling_map0 {
+					trip = <&soc_trip10>;
+					cooling-device = <&cpu_cluster0 0 0>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map1 {
+					trip = <&soc_trip11>;
+					cooling-device = <&cpu_cluster0 0 0>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map2 {
+					trip = <&soc_trip12>;
+					cooling-device = <&cpu_cluster0 0 1>;
+					contribution = <1024>;
+				};
+				cpucore_cooling_map3 {
+					trip = <&soc_trip13>;
+					cooling-device = <&cpu_cluster0 1 2>;
+					contribution = <1024>;
+				};
+
+				gpufreq_cooling_map0 {
+					trip = <&soc_trip10>;
+					cooling-device = <&clark 0 0>; /* min cooling state, max cooling state in this map */
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map1 {
+					trip = <&soc_trip11>;
+					cooling-device = <&clark 0 0>;
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map2 {
+					trip = <&soc_trip12>;
+					cooling-device = <&clark 0 1>;
+					contribution = <1024>;
+				};
+				gpufreq_cooling_map3 {
+					trip = <&soc_trip13>;
+					cooling-device = <&clark 1 1>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map0 {
+					trip = <&soc_trip10>;
+					cooling-device = <&wifi_cool 0 0>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map1 {
+					trip = <&soc_trip11>;
+					cooling-device = <&wifi_cool 0 1>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map2 {
+					trip = <&soc_trip12>;
+					cooling-device = <&wifi_cool 1 2>;
+					contribution = <1024>;
+				};
+				wifi_cooling_map3 {
+					trip = <&soc_trip13>;
+					cooling-device = <&wifi_cool 2 2>;
+					contribution = <1024>;
+				};
+			};	/* cooling maps */
+		}; /* soc thermal */
+	};
+};

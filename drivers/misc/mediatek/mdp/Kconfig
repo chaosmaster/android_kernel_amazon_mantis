@@ -1,0 +1,4 @@
+config MTK_MDP
+	bool "use imgresz rotate for scale & rotate"
+	help
+		This enable use imgresz & rotate HW for scale down picture & rotate

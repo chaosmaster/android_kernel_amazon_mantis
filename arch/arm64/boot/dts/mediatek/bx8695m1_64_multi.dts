@@ -1,0 +1,471 @@
+/*
+ * Copyright (c) 2017 MediaTek Inc.
+ * Author: Joe Yang <joe.yang@mediatek.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+#include "mt8695.dtsi"
+
+/ {
+	model = "MediaTek MT8695M2 Board";
+	compatible = "mediatek,mt8695m2", "mediatek,mt8695";
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0 0x40000000 0 0x40000000>;
+	};
+
+	extcon_usb: extcon_iddig {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&pio 19 GPIO_ACTIVE_HIGH>;
+	};
+
+	chosen {
+		bootargs = "console=tty0 console=ttyS1,921600n1 \
+earlycon=uart8250,mmio32,0x11003000 root=/dev/ram initrd=0x44000000,0x600000 \
+loglevel=8 initcall_debug=1 androidboot.selinux=permissive \
+androidboot.hardware=mt8695 androidboot.serialno=0123456789ABCDEF";
+	};
+
+	mmc_fixed_3v3: fixedregulator@0 {
+		compatible = "regulator-fixed";
+		regulator-name = "mmc_power";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	mmc_fixed_1v8_io: fixedregulator@1 {
+		compatible = "regulator-fixed";
+		regulator-name = "mmc_io";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	usb_vbus_5v0: fixedregulator@2 {
+		compatible = "regulator-fixed";
+		regulator-name = "vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&pio 20 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-type = "voltage";
+	};
+
+	sound: sound {
+		compatible = "mediatek,mt8695-audio-card";
+		mediatek,platform = <&afe>;
+		pinctrl-names = "audio_default_pins";
+		pinctrl-0 = <&audio_default_pins>;
+		tdmadc-rst-gpio = <&pio 81 0>;
+		status = "okay";
+	};
+};
+
+&cpu0 {
+	proc-supply = <&mt6393_vproc_reg>;
+};
+
+&cpu1 {
+	proc-supply = <&mt6393_vproc_reg>;
+};
+
+&cpu2 {
+	proc-supply = <&mt6393_vproc_reg>;
+};
+
+&cpu3 {
+	proc-supply = <&mt6393_vproc_reg>;
+};
+
+&hdmitx {
+	pinctrl-names = "default";
+	pinctrl-0 = <&hdmi_default>;
+};
+
+&i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pins>;
+	status = "okay";
+};
+
+&i2c1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c1_pins>;
+	status = "okay";
+
+	mt6393_regulator: mt6393regulator@0x60 {
+		compatible = "mediatek,mt6393-regulator";
+		reg = <0x60>;
+		pmic,suspend_gpio = <&pio 52 0>; /* pmic_suspend gpio number */
+		normal_mode = <0>;
+
+		mt6393_vproc_reg: buck_vproc {
+			regulator-name = "vproc";
+			regulator-min-microvolt = < 600000>;
+			regulator-max-microvolt = <1393750>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+
+		mt6393_vddr_reg: buck_vddr {
+			regulator-name = "vddr";
+			regulator-min-microvolt = <1100000>;
+			regulator-max-microvolt = <1100000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+
+		mt6393_vio18_reg: buck_vio18 {
+			regulator-name = "vio18";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+
+		mt6393_vio33_reg: buck_vio33 {
+			regulator-name = "vio33";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+
+		mt6393_vsd_reg: ldo_sd {
+			regulator-name = "sd";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+	};
+};
+
+&i2c2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2_pins>;
+	status = "okay";
+	md1122-phy@60 {
+		compatible = "mediatek,md1122";
+		reg = <0x60>;
+	};
+
+	rt5748_vgpu_reg: rt5738_buck@51 {
+		compatible = "richtek,rt5738h";
+		reg = <0x51>;
+		regulator-name = "rt5738-vgpu";
+		regulator-min-microvolt = <300000>;
+		regulator-max-microvolt = <1300000>;
+		regulator-boot-on;
+		regulator-enable-ramp-delay = <100>;
+		ramp_up = <1>; /* 1 : 12mV/us */
+		ramp_down = <3>; /* 3 : 3mV/us */
+	};
+
+	rt5748_vsram_reg: rt5738_buck@55 {
+		compatible = "richtek,rt5738l";
+		status = "disabled";
+		reg = <0x55>;
+		regulator-name = "rt5738-vsram";
+		regulator-min-microvolt = <300000>;
+		regulator-max-microvolt = <1300000>;
+		regulator-always-on;
+		regulator-boot-on;
+		ramp_up = <1>; /* 1 : 12mV/us */
+		ramp_down = <3>; /* 3 : 3mV/us */
+	};
+};
+
+&irrx {
+	pinctrl-names = "default";
+	pinctrl-0 = <&irrx_pins_ir_input>;
+	status = "okay";
+};
+
+&mmc0 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc0_pins_default>;
+	pinctrl-1 = <&mmc0_pins_uhs>;
+	status = "okay";
+	bus-width = <8>;
+	max-frequency = <200000000>;
+	cap-mmc-highspeed;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	cap-mmc-hw-reset;
+	hs400-ds-delay = <0x14019>;
+	r_smpl = <0>;
+	vmmc-supply = <&mmc_fixed_3v3>;
+	vqmmc-supply = <&mmc_fixed_1v8_io>;
+	assigned-clocks = <&topckgen CLK_TOP_MSDC50_0_SEL>;
+	assigned-clock-parents = <&topckgen CLK_TOP_MSDCPLL>;
+	non-removable;
+};
+
+&mmc2 {
+	pinctrl-names = "default", "state_uhs";
+	pinctrl-0 = <&mmc2_pins_default>;
+	pinctrl-1 = <&mmc2_pins_uhs>;
+	status = "okay";
+	bus-width = <4>;
+	max-frequency = <200000000>;
+	cap-sd-highspeed;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
+	keep-power-in-suspend;
+	enable-sdio-wakeup;
+	cap-sdio-irq;
+	non-removable;
+	assigned-clocks = <&topckgen CLK_TOP_MSDC30_2_SEL>;
+	assigned-clock-parents = <&topckgen CLK_TOP_MSDCPLL_D2>;
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pin>;
+	status = "okay";
+};
+
+&pio {
+	audio_default_pins: aud_pins {
+		aud_pinmux {
+			pinmux = <MT8695_PIN_100_I2SO0_BCK__FUNC_I2SO0_BCK>,
+				 <MT8695_PIN_101_I2SO0_LRCK__FUNC_I2SO0_WS>,
+				 <MT8695_PIN_102_I2SO0_MCLK__FUNC_I2SO0_MCK>,
+				 <MT8695_PIN_103_I2SO0_DATA0__FUNC_I2SO0_DO>,
+				 <MT8695_PIN_104_I2SO0_DATA1__FUNC_I2SO1_DO>,
+				 <MT8695_PIN_105_I2SO1_MCLK__FUNC_I2SO2_DO>,
+				 <MT8695_PIN_106_I2SO1_DATA__FUNC_I2SO3_DO>,
+				 <MT8695_PIN_96_SPI1_CSN__FUNC_TDMIN_DI>,
+				 <MT8695_PIN_97_SPI1_SI__FUNC_TDMIN_BCK>,
+				 <MT8695_PIN_98_SPI1_CK__FUNC_TDMIN_LRCK>,
+				 <MT8695_PIN_99_SPI1_SO__FUNC_TDMIN_MCLK>,
+				 <MT8695_PIN_109_DMIC1_SCK__FUNC_DMIC0_SCK>,
+				 <MT8695_PIN_110_DMIC1_DAT__FUNC_DMIC0_DAT>,
+				 <MT8695_PIN_111_DMIC0_SCK__FUNC_DMIC0_DAT_R>,
+				 <MT8695_PIN_82_SPDIF__FUNC_SPDIF_OUT>;
+		};
+	};
+
+	hdmi_default: hdmi {
+		hdmi_cec {
+			pinmux = <MT8695_PIN_72_HDMITX20_CEC__FUNC_HDMITX20_CEC>;
+		};
+		hdmi_pins {
+			pinmux = <MT8695_PIN_74_HDMITX20_HDMISCK__FUNC_SCL_HDMI>,
+				 <MT8695_PIN_75_HDMITX20_HDMISD__FUNC_SDA_HDMI>;
+				 drive-strength = <MTK_DRIVE_10mA>;
+				 bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+		hdmi_hotplug {
+			pinmux = <MT8695_PIN_73_HDMITX20_HTPLG__FUNC_HDMITX20_HTPLG>;
+			bias-pull-down;
+		};
+	};
+
+	i2c0_pins: i2c0 {
+		pins_bus {
+			pinmux = <MT8695_PIN_117_SDA_EPM__FUNC_SDA_EPM>,
+				 <MT8695_PIN_118_SCL_EPM__FUNC_SCL_EPM>;
+			bias-disable;
+		};
+	};
+
+	i2c1_pins: i2c1 {
+		pins_bus {
+			pinmux = <MT8695_PIN_56_SDA1__FUNC_SDA1>,
+				 <MT8695_PIN_57_SCL1__FUNC_SCL1>;
+			bias-disable;
+		};
+	};
+
+	i2c2_pins: i2c2 {
+		pins_bus {
+			pinmux = <MT8695_PIN_76_SDA2__FUNC_SDA2>,
+				 <MT8695_PIN_77_SCL2__FUNC_SCL2>;
+			bias-disable;
+		};
+	};
+
+	irrx_pins_ir_input: irrx_pin_ir {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_51_IR__FUNC_IR_IN>;
+			bias-disable;
+		};
+	};
+
+	mmc0_pins_default: mmc0default {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_44_EMMC_DAT0__FUNC_MSDC0_DAT0>,
+				 <MT8695_PIN_43_EMMC_DAT1__FUNC_MSDC0_DAT1>,
+				 <MT8695_PIN_42_EMMC_DAT2__FUNC_MSDC0_DAT2>,
+				 <MT8695_PIN_41_EMMC_DAT3__FUNC_MSDC0_DAT3>,
+				 <MT8695_PIN_40_EMMC_DAT4__FUNC_MSDC0_DAT4>,
+				 <MT8695_PIN_39_EMMC_DAT5__FUNC_MSDC0_DAT5>,
+				 <MT8695_PIN_38_EMMC_DAT6__FUNC_MSDC0_DAT6>,
+				 <MT8695_PIN_37_EMMC_DAT7__FUNC_MSDC0_DAT7>,
+				 <MT8695_PIN_45_EMMC_CMD__FUNC_MSDC0_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_36_EMMC_CLK__FUNC_MSDC0_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_rst {
+			pinmux = <MT8695_PIN_46_EMMC_RSTB__FUNC_MSDC0_RSTB>;
+			bias-pull-up;
+		};
+	};
+
+	mmc0_pins_uhs: mmc0@0{
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_44_EMMC_DAT0__FUNC_MSDC0_DAT0>,
+				 <MT8695_PIN_43_EMMC_DAT1__FUNC_MSDC0_DAT1>,
+				 <MT8695_PIN_42_EMMC_DAT2__FUNC_MSDC0_DAT2>,
+				 <MT8695_PIN_41_EMMC_DAT3__FUNC_MSDC0_DAT3>,
+				 <MT8695_PIN_40_EMMC_DAT4__FUNC_MSDC0_DAT4>,
+				 <MT8695_PIN_39_EMMC_DAT5__FUNC_MSDC0_DAT5>,
+				 <MT8695_PIN_38_EMMC_DAT6__FUNC_MSDC0_DAT6>,
+				 <MT8695_PIN_37_EMMC_DAT7__FUNC_MSDC0_DAT7>,
+				 <MT8695_PIN_45_EMMC_CMD__FUNC_MSDC0_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_36_EMMC_CLK__FUNC_MSDC0_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_ds {
+			pinmux = <MT8695_PIN_35_EMMC_DSL__FUNC_MSDC0_DSL>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_rst {
+			pinmux = <MT8695_PIN_46_EMMC_RSTB__FUNC_MSDC0_RSTB>;
+			bias-pull-up;
+		};
+
+	};
+
+	mmc2_pins_default: mmc2default {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_33_MSDC2_DATA0__FUNC_MSDC2_DAT0>,
+			       <MT8695_PIN_32_MSDC2_DATA1__FUNC_MSDC2_DAT1>,
+			       <MT8695_PIN_31_MSDC2_DATA2__FUNC_MSDC2_DAT2>,
+			       <MT8695_PIN_30_MSDC2_DATA3__FUNC_MSDC2_DAT3>,
+			       <MT8695_PIN_34_MSDC2_CMD__FUNC_MSDC2_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_28_MSDC2_CLK__FUNC_MSDC2_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_pmu_en {
+			pinmux = <MT8695_PIN_25_GPIO25__FUNC_GPIO25>;
+			bias-pull-up;
+		};
+	};
+
+	mmc2_pins_uhs: mmc2@0 {
+		pins_cmd_dat {
+			pinmux = <MT8695_PIN_33_MSDC2_DATA0__FUNC_MSDC2_DAT0>,
+			       <MT8695_PIN_32_MSDC2_DATA1__FUNC_MSDC2_DAT1>,
+			       <MT8695_PIN_31_MSDC2_DATA2__FUNC_MSDC2_DAT2>,
+			       <MT8695_PIN_30_MSDC2_DATA3__FUNC_MSDC2_DAT3>,
+			       <MT8695_PIN_34_MSDC2_CMD__FUNC_MSDC2_CMD>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_clk {
+			pinmux = <MT8695_PIN_28_MSDC2_CLK__FUNC_MSDC2_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+
+		pins_pmu_en {
+			pinmux = <MT8695_PIN_25_GPIO25__FUNC_GPIO25>;
+			bias-pull-up;
+		};
+	};
+
+	uart1_pin: uart1default {
+		pins_rx {
+			pinmux = <MT8695_PIN_58_URXD1__FUNC_URXD1>;
+			input-enable;
+			bias-pull-up;
+		};
+		pins_tx {
+			pinmux = <MT8695_PIN_59_UTXD1__FUNC_UTXD1>;
+		};
+	};
+
+/* USB GPIO start */
+	usb_id_pins_float: usb_iddig_pull_up {
+		pins_iddig {
+			pinmux = <MT8695_PIN_19_USB_ID__FUNC_IDDIG_A>;
+			bias-pull-up;
+		};
+	};
+
+	usb_id_pins_ground: usb_iddig_pull_down {
+		pins_iddig {
+			pinmux = <MT8695_PIN_19_USB_ID__FUNC_IDDIG_A>;
+			bias-pull-down;
+		};
+	};
+};
+
+&ssusb {
+	vbus-supply = <&usb_vbus_5v0>;
+	extcon = <&extcon_usb>;
+	dr_mode = "otg"; /* 1: host, 2: peripheral, 3: otg (dual-mode) */
+	/* mediatek,enable-wakeup; */
+	/* enable-manual-drd; */
+	pinctrl-names = "default", "id_float", "id_ground";
+	pinctrl-0 = <&usb_id_pins_float>;
+	pinctrl-1 = <&usb_id_pins_float>;
+	pinctrl-2 = <&usb_id_pins_ground>;
+	status = "okay";
+};
+
+&mfg {
+	reg-vgpu-supply = <&rt5748_vgpu_reg>;
+};
+
+&svs {
+	vproc-supply = <&mt6393_vproc_reg>;
+};

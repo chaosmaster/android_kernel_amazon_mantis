@@ -1,0 +1,33 @@
+config MTK_IRRX
+	bool "support MTK irrx"
+	depends on MEDIA_RC_SUPPORT && LIRC
+	help
+		If the platform is supported for IRRX,
+		this configuration should be configured,
+		and the IRRX driver configuration should
+		be configured as well.
+
+config MTK_IRRX_PLAT
+	string "MediaTek irrx register map rely on specific IC"
+	depends on MTK_IRRX
+	default "default"
+	---help---
+	  choose which irrx register map you want to use.
+	  Every IC has its own irrx register map.
+	  So should implement driver rely on specific IC and
+	  get register map from ic designer.
+
+config MTK_IRRX_MOUSE_DRAG
+	bool "Support MTK IR as drag MOUSE"
+	depends on MTK_IRRX
+	help
+		It support IR as drag mouse.
+		When on this mode, you can rotate the viewpoint
+		of 360 video by pressing LEFT/RIGHT/UP/DOWN key of IR.
+		If this option is set, it will support IR as drag mouse.
+
+source "drivers/misc/mediatek/irrx/nec/Kconfig"
+source "drivers/misc/mediatek/irrx/rc5/Kconfig"
+source "drivers/misc/mediatek/irrx/rc6/Kconfig"
+source "drivers/misc/mediatek/irrx/sirc/Kconfig"
+source "drivers/misc/mediatek/irrx/rcmm/Kconfig"

@@ -1,0 +1,43 @@
+config MTK_EMI
+	bool "Enable EMI driver"
+	default n
+	help
+	  Say y here to select this option to enable
+	  EMI driver. This is a basic config for other
+	  emi drivers. So please enable it with CONFIG_MTK_EMI BWL
+	  or CONFIG_MTK_EMI_MPU.
+
+config MTK_EMI_BWL
+	bool "Enable EMI bandwidth limiter"
+	depends on MTK_EMI
+	help
+	  Say y here to select this option to enable the EMI bandwidth limiter.
+	  This driver can only be enabled when CONFIG_MTK_EMI is enabled.
+	  This driver supports to change bandwidth limite settings for different scenairos.
+	  This driver is mainly used for BWC.
+
+config MTK_EMI_MPU
+	bool "Enable EMI MPU"
+	depends on MTK_EMI
+	help
+	  Say y here to select this option to enable the EMI memory protect function.
+	  This driver can only be enabled when CONFIG_MTK_EMI is enabled.
+	  This driver supports to set mpu region in kernel.
+	  This driver supports to monitor current MPU region settings.
+
+config MTK_EMI_7622
+	bool "Enable EMI BWL setting for 7622"
+	help
+	  Say y here to select the EMI bandwidth
+	  settings for 7622. Because of different
+	  ddr type and speed, other platform should
+	  not enable this config.
+
+config MTK_EMI_8695
+	bool "Enable EMI BWL setting for 8695"
+	depends on MTK_EMI
+	help
+	  Say y here to select the EMI bandwidth
+	  setting for 8695. Because of different
+	  ddr type and speed, other platform should
+	  not enable this config.

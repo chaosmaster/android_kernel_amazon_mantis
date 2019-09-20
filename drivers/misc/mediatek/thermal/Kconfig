@@ -1,0 +1,17 @@
+config MTK_TURNKEY_THERMAL
+	bool "MTK_TURNKEY_THERMAL"
+	help
+	  This is for MTK thermal driver.
+
+config BTS_THERMISTOR
+	bool "ntc bts thermistor"
+	default n
+	help
+	  Say Y here if you want to use the external ntc bts thermistor
+
+config AMZN_THERMAL_COOLING
+	bool "amzn thermal cooling"
+	default n
+	help
+	  Use this to define what cooling devices to use and register
+	  the cooling devices on Amazon platform

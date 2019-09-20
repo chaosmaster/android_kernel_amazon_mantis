@@ -1,0 +1,20 @@
+energy-costs {
+	MT8695_CPU_COST_0: mt8695-core-cost0 {
+		busy-cost-data = <
+			1024	0
+		>;
+		idle-cost-data = <
+			0
+			0
+		>;
+	};
+	MT8695_CLUSTER_COST_0: mt8695-cluster-cost0 {
+		busy-cost-data = <
+			1024	0
+		>;
+		idle-cost-data = <
+			0
+			0
+		>;
+	};
+};

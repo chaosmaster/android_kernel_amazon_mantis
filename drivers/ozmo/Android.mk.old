@@ -1,0 +1,11 @@
+LOCAL_PATH := $(call my-dir)
+
+DLKM_DIR := $(TOP)/device/qcom/common/dlkm
+
+include $(CLEAR_VARS)
+LOCAL_MODULE             := ozusb.ko
+LOCAL_MODULE_TAGS        := optional debug
+LOCAL_MODULE_KBUILD_NAME := ozwpan.ko
+LOCAL_MODULE_PATH        := $(TARGET_OUT)/lib/modules/ozwpan
+
+include $(DLKM_DIR)/AndroidKernelModule.mk

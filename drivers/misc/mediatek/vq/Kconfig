@@ -1,0 +1,4 @@
+config MTK_VQ
+	bool "use nr di for noise reduction & deinterlace"
+	help
+		This enable use NR & DI HW for video noise reduction & deinterlace

@@ -1,0 +1,23 @@
+Richtek RT5738 Regulator Driver
+
+Required properties:
+- compatible:
+	"richtek,rt5738_l" for VSEL default low for reset
+	"richtek,rt5738_h" for VSEL default high for reset
+	"richtek,rt5738l" for VSEL always low
+	"richtek,rt5738h" for VSEL always high
+- reg: I2C slave address, usually 0x57
+
+Example:
+
+	rt5748_buck@57 {
+		compatible = "richtek,rt5748_l";
+		reg = <0x57>;
+		regulator-name = "rt5748";
+		regulator-min-microvolt = <300000>;
+		regulator-max-microvolt = <1300000>;
+		regulator-always-on;
+		rt,vsel_gpio = <&pio 0 0>; /* gpio control number */
+		ramp_up = <1>; /* 1 : 12mV/us */
+		ramp_down = <3>; /* 3 : 3mV/us */
+	};
